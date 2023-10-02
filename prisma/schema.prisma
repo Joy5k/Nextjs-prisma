@@ -18,11 +18,12 @@ model user{
   password String @db.VarChar(200)
   otp String @db.VarChar(50)
   created_at DateTime @default(now()) @db.Timestamp
-  updated_at DateTime @default(now()) @db.Timestamp
+  updated_at DateTime @default(now()) @db.Timestamp @updatedAt
   categories categories[]
   customers customers[]
   products products[]
   invoices invoices[]
+  invoices_product invoices_product[]
 }
 model customers{
   id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
@@ -30,7 +31,7 @@ model customers{
   email String @db.VarChar(100)
   user_id BigInt @db.UnsignedBigInt
   created_at DateTime @default(now()) @db.Timestamp
-  updated_at DateTime @default(now()) @db.Timestamp
+  updated_at DateTime @default(now()) @db.Timestamp @updatedAt
   user user @relation(fields: [user_id],references: [id],onDelete:Restrict,onUpdate: Cascade)
   invoices invoices[]
 }
@@ -39,7 +40,7 @@ model categories{
   name String @db.VarChar(50)
   user_id BigInt @db.UnsignedBigInt
   created_at DateTime @default(now()) @db.Timestamp
-  updated_at DateTime @default(now()) @db.Timestamp
+  updated_at DateTime @default(now()) @db.Timestamp @updatedAt
   user user  @relation(fields: [user_id],references: [id],onDelete: Restrict,onUpdate: Cascade)
   products products[]
 }
@@ -52,9 +53,10 @@ model products{
   unit String @db.VarChar(50)
   img_url String @db.VarChar(200)
   created_at DateTime @default(now()) @db.Timestamp
-  updated_at DateTime @default(now()) @db.Timestamp
+  updated_at DateTime @default(now()) @db.Timestamp @updatedAt
   categories categories @relation(fields: [categories_id],references: [id],onDelete: Restrict,onUpdate: Cascade)
   user user  @relation(fields: [user_id],references: [id],onDelete: Restrict,onUpdate: Cascade)
+  invoices_product invoices_product?
 }
 model invoices{
   id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
@@ -65,7 +67,21 @@ model invoices{
   user_id BigInt @db.UnsignedBigInt
   customer_id BigInt @db.UnsignedBigInt
   created_at DateTime @default(now()) @db.Timestamp
-  updated_at DateTime @default(now()) @db.Timestamp
+  updated_at DateTime @default(now()) @db.Timestamp @updatedAt
   customers customers @relation(fields: [customer_id],references: [id],onDelete: Restrict,onUpdate: Cascade)
   user user @relation(fields: [user_id],references: [id],onDelete: Restrict,onUpdate:Cascade)
+  invoices_product invoices_product[]
+}
+model invoices_product{
+  id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  invoice_id BigInt  @db.UnsignedBigInt
+  product_id BigInt @unique @db.UnsignedBigInt
+  user_id BigInt @db.UnsignedBigInt
+  qty String @db.VarChar(50)
+  sales_price String @db.VarChar(50)
+  created_at DateTime @default(now()) @db.Timestamp
+  updated_at DateTime @default(now()) @db.Timestamp @updatedAt
+  invoices invoices @relation(fields: [invoice_id],references: [id],onDelete: Restrict,onUpdate: Cascade)
+  products products @relation(fields: [product_id],references: [id],onDelete: Restrict,onUpdate: Cascade)
+  user user @relation(fields: [user_id],references: [id],onDelete: Restrict,onUpdate: Cascade)
 }
